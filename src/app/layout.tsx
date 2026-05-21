@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar"
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin"
 import { extractRouterConfig } from "uploadthing/server"
 import { ourFileRouter } from "@/lib/uploadthing"
+import { ClerkProvider } from "@clerk/nextjs"
 
 export const metadata: Metadata = {
   title: "Nexus",
@@ -35,6 +36,5 @@ export default async function RootLayout({
 
   if (DEV_MODE) return inner
 
-  const { ClerkProvider } = await import("@clerk/nextjs")
   return <ClerkProvider>{inner}</ClerkProvider>
 }

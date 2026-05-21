@@ -1,3 +1,5 @@
+import { currentUser as clerkCurrentUser } from "@clerk/nextjs/server"
+
 const DEV_MODE = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_") !== true
 
 const mockUser = {
@@ -11,6 +13,5 @@ const mockUser = {
 
 export async function currentUser() {
   if (DEV_MODE) return mockUser as any
-  const { currentUser: clerkCurrentUser } = await import("@clerk/nextjs/server")
   return clerkCurrentUser()
 }
