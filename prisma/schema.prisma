@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String            @id @default(cuid())
+  clerkId          String            @unique
+  email            String            @unique
+  username         String            @unique
+  reputation       Int               @default(0)
+  createdAt        DateTime          @default(now())
+  answers          Answer[]
+  comments         Comment[]
+  posts            Post[]
+  questions        Question[]
+  reputationEvents ReputationEvent[]
+  votes            Vote[]
+}
+
+model Community {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  description String     @default("")
+  createdAt   DateTime   @default(now())
+  posts       Post[]
+  questions   Question[]
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  content     String    @default("")
+  type        String    @default("TEXT")
+  imageUrls   String[]  @default([])
+  videoUrl    String?
+  authorId    String
+  communityId String
+  createdAt   DateTime  @default(now())
+  comments    Comment[]
+  author      User      @relation(fields: [authorId], references: [id])
+  community   Community @relation(fields: [communityId], references: [id])
+  votes       Vote[]
+}
+
+model Question {
+  id               String    @id @default(cuid())
+  title            String
+  content          String
+  authorId         String
+  communityId      String
+  acceptedAnswerId String?
+  tags             String[]
+  createdAt        DateTime  @default(now())
+  answers          Answer[]
+  author           User      @relation(fields: [authorId], references: [id])
+  community        Community @relation(fields: [communityId], references: [id])
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  content    String
+  authorId   String
+  questionId String
+  createdAt  DateTime @default(now())
+  author     User     @relation(fields: [authorId], references: [id])
+  question   Question @relation(fields: [questionId], references: [id])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  String
+  postId    String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+}
+
+model Vote {
+  id     String @id @default(cuid())
+  type   String
+  userId String
+  postId String
+  post   Post   @relation(fields: [postId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, postId])
+}
+
+model ReputationEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  points    Int
+  sourceId  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
